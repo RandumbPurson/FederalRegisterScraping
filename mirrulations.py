@@ -6,7 +6,7 @@ import os
 import boto3
 from botocore import UNSIGNED, config
 import pymongo
-from pymongo.errors import OperationFailure
+from pymongo.errors import OperationFailure, DocumentTooLarge
 
 def mongoConnect():
     """Connect to the MongoDB server at the IP specified in the file at `path`
@@ -133,7 +133,7 @@ def updateCollection(obj, db, collection_name):
         for doc in filtered:
             try:
                 collection.insert_one(doc)
-            except OperationFailure as e:
+            except (OperationFailure, DocumentTooLarge) as e:
                 print("Failed inserting document, retrying without text")
                 try:
                     text = doc.pop("text", None)
